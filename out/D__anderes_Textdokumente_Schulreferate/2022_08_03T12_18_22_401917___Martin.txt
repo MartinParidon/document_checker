@@ -1,0 +1,22 @@
+
+
+Testing: D:\anderes\Textdokumente\Schulreferate
+Using 50 as best string length estimator
+
+D:/anderes/Textdokumente/Schulreferate/BoGy/PKS 2006 Pressemitteilung.pdf
+
+D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+
+D:/anderes/Textdokumente/Schulreferate/Windenergie/referat.pdf
+
+D:/anderes/Textdokumente/Schulreferate/Bill Gates/Bill Gates2.txt
+
+D:/anderes/Textdokumente/Schulreferate/Mond/Der Mond.txt
+
+D:/anderes/Textdokumente/Schulreferate/Seminarkurs/Schlagzeug/Präsentation/playlist.txt
+
+D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+
+Substrings found: 0
+
+Time elapsed: 0.87sec (0.01min)

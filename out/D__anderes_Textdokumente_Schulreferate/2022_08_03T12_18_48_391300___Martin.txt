@@ -1,0 +1,40 @@
+
+
+Testing: D:\anderes\Textdokumente\Schulreferate
+Using 20 as best string length estimator
+
+D:/anderes/Textdokumente/Schulreferate/BoGy/PKS 2006 Pressemitteilung.pdf
+'Schillerstraße 17, 7' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'-2039 E-Mail: presse' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'ZEIDIREKTION GÖPPING' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'EN P R E S S E S T E' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'er Polizeidirektion ' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'lizeidirektion Göppi' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'cht einem Anteil von' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'e Aufklärungsquote b' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'ie Polizeidirektion ' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'direktion Göppingen ' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+'www.polizei -goeppin' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+' +++++++++++++++++++' also found in D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+
+D:/anderes/Textdokumente/Schulreferate/BoGy/Pressemitteilung VU Statistik PDGP 2006.pdf
+
+D:/anderes/Textdokumente/Schulreferate/Windenergie/referat.pdf
+'Moderne Windkraftanl' also found in D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+'g der Windmühlen lie' also found in D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+'gt in Persien. Nach ' also found in D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+'em 9. Jahrhundert dr' also found in D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+' Windmühle in den we' also found in D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+'sien und Afghanistan' also found in D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+
+D:/anderes/Textdokumente/Schulreferate/Bill Gates/Bill Gates2.txt
+
+D:/anderes/Textdokumente/Schulreferate/Mond/Der Mond.txt
+
+D:/anderes/Textdokumente/Schulreferate/Seminarkurs/Schlagzeug/Präsentation/playlist.txt
+
+D:/anderes/Textdokumente/Schulreferate/Windenergie/Moderne WKAs.txt
+
+Substrings found: 18
+
+Time elapsed: 0.78sec (0.01min)
