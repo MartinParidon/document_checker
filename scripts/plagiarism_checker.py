@@ -195,7 +195,7 @@ def main(argv):
 
     today = datetime.now()
     iso_date = today.isoformat()
-    with open(out_path_global + '/' + str(iso_date).replace('-', '_').replace(':', '_').replace('.', '_') + '___' + os.getlogin() + '.txt', 'a') as log_file:
+    with open(out_path_global + '/' + str(iso_date).replace('-', '_').replace(':', '_').replace('.', '_') + '___' + os.getlogin() + '.txt', 'a', encoding="utf-8") as log_file:
         log_file.write(string_to_export_global)
 
     pass
