@@ -4,7 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="772dde6d-5b1f-49fe-924c-5bd9164cf1dc" name="Changes" comment="" />
+    <list default="true" id="772dde6d-5b1f-49fe-924c-5bd9164cf1dc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/in/Bewerbungen - Verknüpfung.lnk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/in/Geschreibsel - Verknüpfung.lnk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/in/Jonas-Religion_9b_Juli-2022.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/in/Lebenslauf - Verknüpfung.lnk" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/in/Masterarbeit_M_Paridon.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/in/Schulreferate - Verknüpfung.lnk" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,14 +37,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/Martin/Documents/git_repos/document_checker",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Martin/Documents/git_repos/document_checker&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.plagiarism_checker_pre">
     <configuration name="phrase_checker" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="bullshit_finder" />
