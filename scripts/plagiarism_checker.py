@@ -15,7 +15,7 @@ types_global = ['/**/*.pdf', '/**/*.doc', '/**/*.docx', '/**/*.txt']
 
 debug_on_global = False
 
-# Suche von n_optimal
+# Search n_optimal
 best_len_str_search_d_chars_global = 5
 best_len_str_search_min_range_global = 3
 best_len_str_search_max_range_global = 21
@@ -109,7 +109,8 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
         edges = []
     # https://towardsdatascience.com/pyvis-visualize-interactive-network-graphs-in-python-77e059791f01
     # https://pyvis.readthedocs.io/en/latest/documentation.html
-    net = Network()
+    net = Network(height='100%', width='70%')
+    net.barnes_hut()
     for i_file, text_string_full_ut in enumerate(text_strings_full):
         my_print('\n' + str(files_ut_paths[i_file]), show_output)
         substrings = []
@@ -125,13 +126,14 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
                     n_subs = n_subs + 1
             if not is_testrun:
                 if len(subs_found) > 0:
-                    net.add_node(os.path.basename(files_ut_paths[i_file]))
-                    net.add_node(os.path.basename(files_ut_paths_clean[i_found_file]))
-                    edges.append((os.path.basename(files_ut_paths[i_file]), os.path.basename(files_ut_paths_clean[i_found_file]), len(subs_found)))
+                    net.add_node(files_ut_paths[i_file])
+                    net.add_node(files_ut_paths_clean[i_found_file])
+                    edges.append((files_ut_paths[i_file], files_ut_paths_clean[i_found_file], len(subs_found)))
     my_print('\nSubstrings found: ' + str(n_subs), show_output)
     if not is_testrun:
         net.add_edges(edges)
-        net.show(out_path_global + '/edges_with_weights.html')
+        net.show_buttons(filter_=['physics'])
+        net.show(out_path_global + '/graph.html')
     return n_subs
 
 
@@ -203,9 +205,9 @@ def main(argv):
 
 if __name__ == "__main__":
     if test_ON:
-        #main([r'D:\anderes\Textdokumente\Schulreferate'])
-        main([r'D:\anderes\Textdokumente\Geschreibsel'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf'])
+        #main([r'D:\anderes\Textdokumente\Schulreferate', 'check', '15'])
+        #main([r'D:\anderes\Textdokumente\Geschreibsel', 'check', '20'])
+        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'check', '60'])
+        main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'check', '50'])
     else:
         main(sys.argv[1:])

@@ -30,13 +30,13 @@ def write_count_dict(cv_in, dict_ut):
 
 def input_handling(argv):
     text_path = argv[0].replace('\\', '/')
-    phrasen_path = argv[1].replace('\\', '/')
-    woerter_path = argv[2].replace('\\', '/')
+    phrases_path = argv[1].replace('\\', '/')
+    words_path = argv[2].replace('\\', '/')
 
     # TODO sanity checks and stuff
     text_ext = os.path.splitext(text_path)[1]
-    phr_ext = os.path.splitext(phrasen_path)[1]
-    w_ext = os.path.splitext(woerter_path)[1]
+    phr_ext = os.path.splitext(phrases_path)[1]
+    w_ext = os.path.splitext(words_path)[1]
     if not (text_ext == '.pdf' or text_ext == '.doc' or text_ext == '.docx'):
         print('Input File neither doc, nor docx, nor pdf.')
         quit()
@@ -44,7 +44,7 @@ def input_handling(argv):
         print('One or all list files not csv format.')
         quit()
 
-    return text_path, phrasen_path, woerter_path
+    return text_path, phrases_path, words_path
 
 
 def prepare_words_list(words_list):
@@ -88,29 +88,29 @@ def make_dir_with_id(text_path):
     return out_dir
 
 
-def console_out(phrasen_dict, woerter_dict, word_count):
-    ratio_bad_words_ph = round((sum(woerter_dict.values()) / word_count) * 100, 2)
-    ratio_bad_phrases_ph = round((sum(phrasen_dict.values()) / word_count) * 100, 2)
+def console_out(phrases_dict, words_dict, word_count):
+    ratio_bad_words_ph = round((sum(words_dict.values()) / word_count) * 100, 2)
+    ratio_bad_phrases_ph = round((sum(phrases_dict.values()) / word_count) * 100, 2)
     print('Bad phrases ratio: {} per houndred words.'.format(str(ratio_bad_phrases_ph)))
     print('Bad word ratio: {} per houndred words.'.format(str(ratio_bad_words_ph)))
-    print('Favourite bad phrase: \"{}\", used {} times.'.format(str(max(phrasen_dict, key=phrasen_dict.get)), str(max(phrasen_dict.values()))))
-    print('Favourite bad word: \"{}\", used {} times.'.format(str(max(woerter_dict, key=woerter_dict.get)), str(max(woerter_dict.values()))))
+    print('Favourite bad phrase: \"{}\", used {} times.'.format(str(max(phrases_dict, key=phrases_dict.get)), str(max(phrases_dict.values()))))
+    print('Favourite bad word: \"{}\", used {} times.'.format(str(max(words_dict, key=words_dict.get)), str(max(words_dict.values()))))
 
 
 def main(argv):
-    text_path, phrasen_path, woerter_path = input_handling(argv)
+    text_path, phrases_path, words_path = input_handling(argv)
 
     out_dir = make_dir_with_id(text_path)
 
     full_text_ut, words_list_ut = get_text_and_wordlist_ut(text_path)
 
-    phrasen_dict = get_count(phrasen_path, full_text_ut)
-    woerter_dict = get_count(woerter_path, words_list_ut)
+    phrases_dict = get_count(phrases_path, full_text_ut)
+    words_dict = get_count(words_path, words_list_ut)
 
-    write_count_dict(out_dir + '/phrases.csv', phrasen_dict)
-    write_count_dict(out_dir + '/words.csv', woerter_dict)
+    write_count_dict(out_dir + '/phrases.csv', phrases_dict)
+    write_count_dict(out_dir + '/words.csv', words_dict)
 
-    console_out(phrasen_dict, woerter_dict, len(words_list_ut))
+    console_out(phrases_dict, words_dict, len(words_list_ut))
 
 
 if __name__ == "__main__":
