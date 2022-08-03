@@ -1,5 +1,9 @@
 Usage
 
+* Install Python 3.7 https://www.python.org/downloads/release/python-370/
+* Install requirements.txt (Open cmd Window, type: pip install PATH/TO/requirements.txt)
+--> You should now have a running Python environment with all the necessary libraries
+
 Word and phrase checker
 --> Currently works with doc, docx and PDF (very old doc files might not work)
 1. Create a custom list of phrases and words. Use the same format as the lists in examples/
