@@ -37,7 +37,14 @@ def save_graph(graph):
     visual_style["edge_curved"] = False
     visual_style["layout"] = graph.layout_fruchterman_reingold()
     graph.es['label'] = graph.es['weight']
-    plot(graph, out_path_global + "/graph.svg", **visual_style)
+    plot(graph, **visual_style)
+    try:
+        graph.write_dot(out_path_global + "/graph")
+        plot(graph, out_path_global + "/graph.pdf", **visual_style)
+        plot(graph, out_path_global + "/graph.svg", **visual_style)
+    except Exception as e:
+        my_print(str(e), True)
+        quit()
 
 
 def get_file_paths(root_dir):
