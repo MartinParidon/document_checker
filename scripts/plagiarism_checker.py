@@ -4,9 +4,10 @@ from PyPDF2 import PdfReader
 import matplotlib.pyplot as plt
 import time
 import statistics
-# https://towardsdatascience.com/visualising-graph-data-with-python-igraph-b3cc81a495cf
-from igraph import *
 from datetime import datetime
+from pyvis.network import Network
+import os
+import sys
 
 
 # TODO consolidate
@@ -25,26 +26,6 @@ string_to_export_global = ''
 
 in_path_global = ''
 out_path_global = ''
-
-
-def save_graph(graph):
-    visual_style = {"bbox": (3000, 3000)}
-    visual_style["margin"] = 17
-    visual_style["vertex_color"] = 'grey'
-    visual_style["vertex_size"] = 50
-    visual_style["vertex_label_size"] = 8
-    visual_style["vertex_label"] = graph.vs["name"]
-    visual_style["edge_curved"] = False
-    visual_style["layout"] = graph.layout_fruchterman_reingold()
-    graph.es['label'] = graph.es['weight']
-    plot(graph, **visual_style)
-    try:
-        graph.write_dot(out_path_global + "/graph_dot_format")
-        plot(graph, out_path_global + "/graph.pdf", **visual_style)
-        plot(graph, out_path_global + "/graph.svg", **visual_style)
-    except Exception as e:
-        my_print('Somehow, I couldn\'t save the graph...\n ' + str(e), True)
-        quit()
 
 
 def get_file_paths(root_dir):
@@ -126,6 +107,9 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
     n_subs = 0
     if not is_testrun:
         edges = []
+    # https://towardsdatascience.com/pyvis-visualize-interactive-network-graphs-in-python-77e059791f01
+    # https://pyvis.readthedocs.io/en/latest/documentation.html
+    net = Network()
     for i_file, text_string_full_ut in enumerate(text_strings_full):
         my_print('\n' + str(files_ut_paths[i_file]), show_output)
         substrings = []
@@ -141,11 +125,13 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
                     n_subs = n_subs + 1
             if not is_testrun:
                 if len(subs_found) > 0:
+                    net.add_node(os.path.basename(files_ut_paths[i_file]))
+                    net.add_node(os.path.basename(files_ut_paths_clean[i_found_file]))
                     edges.append((os.path.basename(files_ut_paths[i_file]), os.path.basename(files_ut_paths_clean[i_found_file]), len(subs_found)))
     my_print('\nSubstrings found: ' + str(n_subs), show_output)
     if not is_testrun:
-        graph = Graph.TupleList(edges, weights=True)
-        save_graph(graph)
+        net.add_edges(edges)
+        net.show(out_path_global + '/edges_with_weights.html')
     return n_subs
 
 
@@ -174,7 +160,7 @@ def set_and_make_out_dir(in_path):
     global out_path_global
     global in_path_global
     if not len(os.listdir(in_path)) == 0:
-        in_path_global = in_path  # TODO SANITY CHECK!!
+        in_path_global = in_path
         out_path_global = os.path.split(os.path.realpath(__file__))[0] + '/../out/' + in_path_global.replace('\\', '_').replace(':', '_')
         os.makedirs(out_path_global, exist_ok=True)
     else:
