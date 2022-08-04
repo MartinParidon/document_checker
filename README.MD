@@ -18,7 +18,7 @@
 
 *This tool will use ALL the documents within any sub folders of the root directory. So if there are 10000 documents anywhere below that folder, it will run through them all.*
 
-*ot that this tool has 2 modes. First mode (pre-check) is to analyse the structure of your texts. In short, it will tell you which parameter to specify for the actual check.*
+*Note that this tool has 2 modes. First mode (pre-check) is to analyse the structure of your texts. In short, it will tell you which parameter to specify for the actual check.*
 
 ### Pre-check
 1. Double click call_plagiariasm_pre_check.bat
