@@ -3,6 +3,7 @@
 ## Before you start
 * Install Python 3.7 https://www.python.org/downloads/release/python-370/
 * Install requirements.txt (Open cmd Window, type: pip install PATH/TO/requirements.txt)
+
 *You should now have a running Python environment with all the necessary libraries*
 
 ## Word and phrase checker
@@ -14,7 +15,9 @@
 
 ## Plagiarism checker
 *Currently works with doc, docx and PDF, as well as txt (very old doc files might not work)*
+
 *This tool will use ALL the documents within any sub folders of the root directory. So if there are 10000 documents anywhere below that folder, it will run through them all.*
+
 *ot that this tool has 2 modes. First mode (pre-check) is to analyse the structure of your texts. In short, it will tell you which parameter to specify for the actual check.*
 
 ### Pre-check
@@ -29,8 +32,8 @@
 3. Specify the number that you found using the pre-checker. If you have absolutely no idea, write 50.
 4. Find output in out/
 
-[TODOS]
+## TODOS
 * Input sanity checks and early out (?)
 * GUI
 * cfg file support (YAML)
-* Percentages and diagrams
+* Output formats and structure
