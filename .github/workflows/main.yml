@@ -26,7 +26,7 @@ jobs:
         uses: python.exe -m pip install --upgrade pip
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt --use-feature=2020-resolver
 
       #- name: Run Unit Test
       #  run: python -m unittest discover tests
