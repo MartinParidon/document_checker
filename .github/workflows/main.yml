@@ -22,8 +22,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
           architecture: x64
 
+      - name: Install new pip version
+        uses: python.exe -m pip install --upgrade pip
+
       - name: Install dependencies
-        run: pip install -r requirements.txt --use-feature=2020-resolver
+        run: pip install -r requirements.txt
 
       #- name: Run Unit Test
       #  run: python -m unittest discover tests
