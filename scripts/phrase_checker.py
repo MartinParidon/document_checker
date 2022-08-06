@@ -6,12 +6,11 @@ from PyPDF2 import PdfReader
 import re
 
 
-def get_count(csv_path, in_list_OR_string):
-    in_list = get_list_from_csv_first_row(csv_path)
+def get_count(in_list, in_list_OR_string):
     out_dict = dict.fromkeys(in_list)
     for elem_ut in in_list:
         out_dict[elem_ut] = in_list_OR_string.count(elem_ut)
-    return out_dict
+    return dict(sorted(out_dict.items(), key=lambda kv: kv[1], reverse=True))
 
 
 def get_list_from_csv_first_row(csv_file):
@@ -29,25 +28,35 @@ def write_count_dict(cv_in, dict_ut):
 
 
 def input_handling(argv):
-    text_path = argv[0].replace('\\', '/')
-    phrases_path = argv[1].replace('\\', '/')
-    words_path = argv[2].replace('\\', '/')
-
-    # TODO sanity checks and stuff
-    text_ext = os.path.splitext(text_path)[1]
-    phr_ext = os.path.splitext(phrases_path)[1]
-    w_ext = os.path.splitext(words_path)[1]
-    if not (text_ext == '.pdf' or text_ext == '.doc' or text_ext == '.docx'):
-        print('Input File neither doc, nor docx, nor pdf.')
+    try:
+        text_ut_path = argv[0].replace('\\', '/')
+        phrases_path = argv[1].replace('\\', '/')
+        words_path = argv[2].replace('\\', '/')
+    except Exception as e:
+        print('You didn\'t provide all necessary input params.\n' + str(e))
         quit()
-    if not (phr_ext == '.csv' and w_ext == '.csv'):
-        print('One or all list files not csv format.')
+    if os.path.exists(text_ut_path) and os.path.exists(phrases_path) and os.path.exists(words_path):
+        text_ut_ext = os.path.splitext(text_ut_path)[1]
+        phrases_path_ext = os.path.splitext(phrases_path)[1]
+        words_path_ext = os.path.splitext(words_path)[1]
+        if not (text_ut_ext == '.pdf' or text_ut_ext == '.doc' or text_ut_ext == '.docx'):
+            print('Check your doc input path extensions.\nText under test must be pdf, dox or doc (very old doc files might not work).')
+            quit()
+        elif not (phrases_path_ext == '.csv'):
+            print('Phrase list not csv format.')
+            quit()
+        elif not (words_path_ext == '.csv'):        # TODO: Check if no 'space' within any entry of list
+            print('Word list not csv format.')
+            quit()
+        else:
+            return text_ut_path, phrases_path, words_path
+    else:
+        print('Check if all your input paths are valid.')
         quit()
 
-    return text_path, phrases_path, words_path
 
-
-def prepare_words_list(words_list):
+def extract_words_only_from_string(full_text_ut):
+    words_list = re.split(' |\n', full_text_ut)
     signs_to_delete = [',', '.', '-', '_', '–', ':', '(', ')', '[', ']']
     words_filtered = []
     for sign in signs_to_delete:
@@ -65,7 +74,7 @@ def prepare_words_list(words_list):
     return words_filtered
 
 
-def get_text_and_wordlist_ut(text_path):
+def get_text_from_path(text_path):
     txt_file_ext = text_path.split('.')[-1]
     if (txt_file_ext == 'doc') or (txt_file_ext == 'docx'):
         full_text_ut = docx2txt.process(text_path)
@@ -74,11 +83,9 @@ def get_text_and_wordlist_ut(text_path):
         full_text_ut = ""
         for page in reader.pages:
             full_text_ut += page.extract_text() + " "
-    # ...else... Rest should be filtered out by input treatment!
-
-    words_list_raw = re.split(' |\n', full_text_ut)
-    words_list_ut = prepare_words_list(words_list_raw)
-    return full_text_ut, words_list_ut
+    elif txt_file_ext == 'txt':
+        pass    # Add functionality
+    return full_text_ut
 
 
 def make_dir_with_id(text_path):
@@ -89,28 +96,51 @@ def make_dir_with_id(text_path):
 
 
 def console_out(phrases_dict, words_dict, word_count):
-    ratio_bad_words_ph = round((sum(words_dict.values()) / word_count) * 100, 2)
-    ratio_bad_phrases_ph = round((sum(phrases_dict.values()) / word_count) * 100, 2)
-    print('Bad phrases ratio: {} per houndred words.'.format(str(ratio_bad_phrases_ph)))
-    print('Bad word ratio: {} per houndred words.'.format(str(ratio_bad_words_ph)))
-    print('Favourite bad phrase: \"{}\", used {} times.'.format(str(max(phrases_dict, key=phrases_dict.get)), str(max(phrases_dict.values()))))
-    print('Favourite bad word: \"{}\", used {} times.'.format(str(max(words_dict, key=words_dict.get)), str(max(words_dict.values()))))
+    sorted_keys_phrases = [item[0] for item in phrases_dict.items()]
+    sorted_values_phrases = [item[1] for item in phrases_dict.items()]
+    sorted_keys_words = [item[0] for item in words_dict.items()]
+    sorted_values_words = [item[1] for item in words_dict.items()]
+    phrases_ratio = round((sum(phrases_dict.values()) / word_count) * 100, 2)
+    words_ratio = round((sum(words_dict.values()) / word_count) * 100, 2)
+    print('\n{} bad phrases per houndred words. Favourites:'.format(str(phrases_ratio)))
+    for i_word in range(0, 9):
+        print('\"{}\": {}'.format(str(sorted_keys_phrases[i_word]), str(sorted_values_phrases[i_word])))
+    print('\n{} bad words per houndred words. Favourites:'.format(str(words_ratio)))
+    for i_word in range(0, 9):
+        print('\"{}\": {}'.format(str(sorted_keys_words[i_word]), str(sorted_values_words[i_word])))
 
 
 def main(argv):
+    # If valid, fetch path to text and input list
     text_path, phrases_path, words_path = input_handling(argv)
 
+    # Make output directory
     out_dir = make_dir_with_id(text_path)
 
-    full_text_ut, words_list_ut = get_text_and_wordlist_ut(text_path)
+    # Fetch full text of file in local string
+    full_text_ut = get_text_from_path(text_path)
 
-    phrases_dict = get_count(phrases_path, full_text_ut)
-    words_dict = get_count(words_path, words_list_ut)
+    # Fetch list of bad phrases from provided csv file
+    phrases_list = get_list_from_csv_first_row(phrases_path)
 
+    # Get count of bad phrases as absolute counts within full text
+    phrases_dict = get_count(phrases_list, full_text_ut)
+
+    # Fetch list of bad words from provided csv file
+    words_list = get_list_from_csv_first_row(words_path)
+
+    # Fetch list of individual words within doc ut
+    single_words_within_txt_ut = extract_words_only_from_string(full_text_ut)
+
+    # Get count of bad words as absolute counts within list of words
+    words_dict = get_count(words_list, single_words_within_txt_ut)
+
+    # Write output dicts to csv
     write_count_dict(out_dir + '/phrases.csv', phrases_dict)
     write_count_dict(out_dir + '/words.csv', words_dict)
 
-    console_out(phrases_dict, words_dict, len(words_list_ut))
+    # Write console output
+    console_out(phrases_dict, words_dict, len(single_words_within_txt_ut))
 
 
 if __name__ == "__main__":

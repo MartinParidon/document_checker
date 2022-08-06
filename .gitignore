@@ -1,4 +1,5 @@
 /out/*
-/test
+/test-input
+/unit-tests
 /.idea
 *.html
