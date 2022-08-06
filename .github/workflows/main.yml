@@ -23,10 +23,10 @@ jobs:
           architecture: x64
 
       - name: Install new pip version
-        run: python.exe -m pip install --upgrade pip
+        run: python.exe -m pip install -r requirements.txt --use-feature=2020-resolver
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt --use-feature=2020-resolver
+      #- name: Install dependencies
+      #  run: pip install -r requirements.txt --use-feature=2020-resolver
 
       #- name: Run Unit Test
       #  run: python -m unittest discover tests
