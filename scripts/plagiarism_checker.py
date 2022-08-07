@@ -78,17 +78,14 @@ def get_full_text(text_path):
 def read_text_strings(files_ut_paths):
     full_text_ut_list = []
     files_ut_paths_to_remove = []
-    i = 0       # dbg
-    for text_path in files_ut_paths:
+    for i_path, text_path in enumerate(files_ut_paths):
         my_print('\n\n')
         full_text_raw = get_full_text(text_path)
         if full_text_raw is not None:
-            full_text_fixed = full_text_raw#.replace('\n\n', ' ')
-            full_text_ut_list.append(full_text_fixed)
-            my_print('file: ' + str(i) + ', path: ' + files_ut_paths[i] + ': \n' + full_text_fixed)
+            my_print('file: ' + str(i_path) + ', path: ' + files_ut_paths[i_path] + ': \n' + full_text_raw)
+            full_text_ut_list.append(full_text_raw)
         else:
             files_ut_paths_to_remove.append(text_path)
-        i = i + 1
     files_ut_paths_cleaned = [files_ut_path for files_ut_path in files_ut_paths if files_ut_path not in files_ut_paths_to_remove]
     return full_text_ut_list, files_ut_paths_cleaned
 
