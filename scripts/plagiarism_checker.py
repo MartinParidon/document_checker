@@ -1,16 +1,12 @@
 import glob
-import docx2txt
-from PyPDF2 import PdfReader
 import matplotlib.pyplot as plt
 import time
 from datetime import datetime
 from pyvis.network import Network
 import os
 import sys
+from scripts import common
 
-
-# TODO consolidate
-types_global = ['/**/*.pdf', '/**/*.doc', '/**/*.docx', '/**/*.txt']
 
 debug_on_global = False
 
@@ -32,50 +28,17 @@ default_cutoff_global = 0.9
 
 
 def get_file_paths(root_dir):
-    types = []
-    for type_iter in types_global:
-        types.append(root_dir + type_iter)
+    search_patterns_relative = ['/**/*.' + ext for ext in common.supported_extensions_global]
+    search_patterns_absolute = []
+    for type_iter in search_patterns_relative:
+        search_patterns_absolute.append(root_dir + type_iter)
     files_grabbed = []
-    for files in types:
+    for files in search_patterns_absolute:
         files_grabbed.extend(glob.glob(files, recursive=True))
     file_paths = []
-    [file_paths.append(file.replace('\\', '/')) for file in files_grabbed if (file.split('.')[-1] == 'pdf' or file.split('.')[-1] == 'doc' or file.split('.')[-1] == 'docx' or file.split('.')[-1] == 'txt')]
+    [file_paths.append(file_grabbed.replace('\\', '/')) for file_grabbed in files_grabbed]
     my_print(file_paths)
     return file_paths
-
-
-# TODO consolidate with phrase_checker
-def get_full_text(text_path):
-    # TODO check with types_global
-    txt_file_ext = text_path.split('.')[-1]
-    if (txt_file_ext == 'doc') or (txt_file_ext == 'docx'):
-        try:
-            full_text_ut = docx2txt.process(text_path)
-            if full_text_ut:
-                return full_text_ut
-            else:
-                return None
-        except Exception:
-            return None
-    elif txt_file_ext == 'pdf':
-        reader = PdfReader(text_path)
-        full_text_ut = ""
-        for page in reader.pages:
-            try:
-                full_text_ut += page.extract_text() + " "
-            except Exception:
-                continue
-        if full_text_ut:
-            return full_text_ut
-        else:
-            return None
-    elif txt_file_ext == 'txt':
-        with open(text_path, "r") as text_file:
-            full_text_ut = text_file.read()
-            if full_text_ut:
-                return full_text_ut
-            else:
-                return None
 
 
 def read_text_strings(files_ut_paths):
@@ -83,7 +46,7 @@ def read_text_strings(files_ut_paths):
     files_ut_paths_to_remove = []
     for i_path, text_path in enumerate(files_ut_paths):
         my_print('\n\n')
-        full_text_raw = get_full_text(text_path)
+        full_text_raw = common.get_string_from_path(text_path)
         if full_text_raw is not None:
             my_print('file: ' + str(i_path) + ', path: ' + files_ut_paths[i_path] + ': \n' + full_text_raw)
             full_text_ut_list.append(full_text_raw)
@@ -181,24 +144,33 @@ def set_and_make_out_dir(in_path):
 
 
 def main(argv):
+    # Start timer
     start_time = round(time.perf_counter(), 2)
 
+    # Python...
     global out_path_global
     global default_best_str_global
     global string_to_export_global
 
+    # Flush output string
     string_to_export_global = ''
 
-    find_best_str_len_ = argv[1]
+    # TODO Implement...     # Implement...  https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
+    # Set output path according to given input path name. Then print
+    in_path = argv[0]
+    set_and_make_out_dir(in_path)
+    my_print('\nTesting: ' + in_path, show_output=True)
 
-    set_and_make_out_dir(argv[0])
-
-    my_print('\nTesting: ' + argv[0], show_output=True)
-
+    # Get all file paths that fit 1. given input path, 2. globally defined extensions
     files_ut_paths_unfiltered = get_file_paths(argv[0])
 
+    # Get full strings of valid files and their respective paths
     text_strings_full, files_ut_paths = read_text_strings(files_ut_paths_unfiltered)
 
+    # Switch between 'find' best string length and 'use-explicit' string length. No other string allowed
+    find_best_str_len_ = argv[1]
+
+    # Based on that switch, either find best string length, use given string length or use default string length
     if find_best_str_len_ == 'find':
         best_str_len = find_best_str_len(text_strings_full, files_ut_paths)
     elif find_best_str_len_ == 'use-explicit':
@@ -211,27 +183,28 @@ def main(argv):
         best_str_len = default_best_str_global
         my_print('False or no argument. Using default string length.', show_output=True)
 
+    # Print used string length and run test
     my_print('Using ' + str(best_str_len) + ' as best string length estimator', show_output=True)
     find_i_subs(text_strings_full, files_ut_paths, False, best_str_len)
 
+    # Write total elapsed time
     time_elapsed_s = time.perf_counter() - start_time
     time_elapsed_m = time_elapsed_s / 60
     my_print('\nTime elapsed: ' + str(round(time_elapsed_s, 2)) + 'sec (' + str(round(time_elapsed_m, 2)) + 'min)', show_output=True)
 
+    # Write out log file
     today = datetime.now()
     iso_date = today.isoformat()
     with open(out_path_global + '/' + str(iso_date).replace('-', '_').replace(':', '_').replace('.', '_') + '___' + os.getlogin() + '.txt', 'a', encoding="utf-8") as log_file:
         log_file.write(string_to_export_global)
 
-    pass
-
 
 if __name__ == "__main__":
     if test_ON:
-        #main([r'D:\anderes\Textdokumente\Schulreferate', 'find'])
-        #main([r'D:\anderes\Textdokumente\Geschreibsel', 'find'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'find'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'find'])
+        main([r'D:\anderes\Textdokumente\Schulreferate', 'find'])
+        main([r'D:\anderes\Textdokumente\Geschreibsel', 'find'])
+        main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'find'])
+        main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'find'])
         #main([r'D:\anderes\Textdokumente\Schulreferate', 'use-explicit'])
         #main([r'D:\anderes\Textdokumente\Geschreibsel', 'use-explicit', '20'])
         #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'use-explicit', '50'])

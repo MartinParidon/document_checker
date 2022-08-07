@@ -1,9 +1,8 @@
 import sys
-import docx2txt
 import csv
 import os
-from PyPDF2 import PdfReader
 import re
+from scripts import common
 
 
 def get_count_in_list(elements_ut, list_ut):
@@ -51,13 +50,13 @@ def input_handling(argv):
         text_ut_ext = os.path.splitext(text_ut_path)[1]
         phrases_path_ext = os.path.splitext(phrases_path)[1]
         words_path_ext = os.path.splitext(words_path)[1]
-        if not (text_ut_ext == '.pdf' or text_ut_ext == '.doc' or text_ut_ext == '.docx'):
+        if text_ut_ext.replace('.', '') not in common.supported_extensions_global:
             print('Check your doc input path extensions.\nText under test must be pdf, dox or doc (very old doc files might not work).')
             quit()
         elif not (phrases_path_ext == '.csv'):
             print('Phrase list not csv format.')
             quit()
-        elif not (words_path_ext == '.csv'):        # TODO: Check if no 'space' within any entry of list
+        elif not (words_path_ext == '.csv'):
             print('Word list not csv format.')
             quit()
         else:
@@ -84,20 +83,6 @@ def extract_words_only_from_string(full_text_ut):
             words_filtered.append(word)
     words_filtered = [x for x in words_filtered if not (x.isdigit())]
     return words_filtered
-
-
-def get_text_from_path(text_path):
-    txt_file_ext = text_path.split('.')[-1]
-    if (txt_file_ext == 'doc') or (txt_file_ext == 'docx'):
-        full_text_ut = docx2txt.process(text_path)
-    elif txt_file_ext == 'pdf':
-        reader = PdfReader(text_path)
-        full_text_ut = ""
-        for page in reader.pages:
-            full_text_ut += page.extract_text() + " "
-    elif txt_file_ext == 'txt':
-        pass    # Add functionality
-    return full_text_ut
 
 
 def make_dir_with_id(text_path):
@@ -130,8 +115,14 @@ def main(argv):
     out_dir = make_dir_with_id(text_path)
 
     # Fetch full text of file in local string
-    full_text_ut = get_text_from_path(text_path)
+    full_text_ut = common.get_string_from_path(text_path)
 
+    # Early out if doc empty
+    if not full_text_ut:
+        print('Document under test is empty. Provide link to a document that is not empty.')
+        quit()
+
+    # TODO: Check if no 'space' within any entry of list
     # Fetch list of bad phrases from provided csv file
     phrases_list = get_list_from_csv_first_row(phrases_path)
 

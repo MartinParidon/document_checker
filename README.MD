@@ -34,7 +34,6 @@
 4. Find output in out/
 
 ## TODOS
-* Input sanity checks and early out (?)
 * GUI
 * cfg file support (YAML)
 * Output formats and structure
