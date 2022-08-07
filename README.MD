@@ -18,18 +18,19 @@
 
 *This tool will use ALL the documents within any sub folders of the root directory. So if there are 10000 documents anywhere below that folder, it will run through them all.*
 
-*Note that this tool has 2 modes. First mode (pre-check) is to analyse the structure of your texts. In short, it will tell you which parameter to specify for the actual check.*
+*Note that this tool has 2 modes. Try to run it fully automatic by using call_plagiariasm_checker_find.bat. This will find the best string length by itself. If this won't work, you'll need to dig deeper*
 
-### Pre-check
-1. Double click call_plagiariasm_pre_check.bat
+### Mode 1: Let the script find the best string length itself
+1. Double click call_plagiariasm_find.bat
 2. Specify the root folder of your documents under test
 3. Find output in out/
-4. From this output, read the "best" string length cutoff value. That is the x value where your chart stays more or less flat. This value will be used in the actual analysis and results will be depending on this value directly.
+4. The script will attempt to find the best string length. This might not work. If it didn't work or you're not happy with the result, see where the 2 plotted lines in plagiarism_analysis_x_ydiff.png cross for the first time. Use the x value at the cut point to run the script again in the use-explicit mode (see next point)
 
-### Actual check
+### Mode 2: Excplicitly tell the script to use a string length of your choice
+*The string length will have direct influence on your results, so be careful!*
 1. Double click call_plagiariasm_checker.bat
 2. Specify the root folder of your documents under test
-3. Specify the number that you found using the pre-checker. If you have absolutely no idea, write 50.
+3. Specify the ideal string length. If you have absolutely no idea, leave it empty. The algorithm will run anyway, with a value of 40.
 4. Find output in out/
 
 ## TODOS
