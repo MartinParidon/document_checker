@@ -6,10 +6,22 @@ from PyPDF2 import PdfReader
 import re
 
 
-def get_count(in_list, in_list_OR_string):
-    out_dict = dict.fromkeys(in_list)
-    for elem_ut in in_list:
-        out_dict[elem_ut] = in_list_OR_string.count(elem_ut)
+def get_count_in_list(elements_ut, list_ut):
+    elements_ut_lower = [e.lower() for e in elements_ut]
+    list_ut_lower = [e.lower() for e in list_ut]
+    out_dict = dict.fromkeys(elements_ut_lower)
+    for elem_ut in elements_ut_lower:
+        out_dict[elem_ut] = list_ut_lower.count(elem_ut)
+    return dict(sorted(out_dict.items(), key=lambda kv: kv[1], reverse=True))
+
+
+# TODO Make sure substring isn't enclosed by chars
+def get_count_in_string(elements_ut, string_ut):
+    elements_ut_lower = [e.lower() for e in elements_ut]
+    string_ut_lower = string_ut.lower()
+    out_dict = dict.fromkeys(elements_ut_lower)
+    for elem_ut in elements_ut_lower:
+        out_dict[elem_ut] = string_ut_lower.count(elem_ut)
     return dict(sorted(out_dict.items(), key=lambda kv: kv[1], reverse=True))
 
 
@@ -124,7 +136,7 @@ def main(argv):
     phrases_list = get_list_from_csv_first_row(phrases_path)
 
     # Get count of bad phrases as absolute counts within full text
-    phrases_dict = get_count(phrases_list, full_text_ut)
+    phrases_dict = get_count_in_string(phrases_list, full_text_ut)
 
     # Fetch list of bad words from provided csv file
     words_list = get_list_from_csv_first_row(words_path)
@@ -133,7 +145,7 @@ def main(argv):
     single_words_within_txt_ut = extract_words_only_from_string(full_text_ut)
 
     # Get count of bad words as absolute counts within list of words
-    words_dict = get_count(words_list, single_words_within_txt_ut)
+    words_dict = get_count_in_list(words_list, single_words_within_txt_ut)
 
     # Write output dicts to csv
     write_count_dict(out_dir + '/phrases.csv', phrases_dict)
