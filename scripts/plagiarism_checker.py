@@ -3,7 +3,6 @@ import docx2txt
 from PyPDF2 import PdfReader
 import matplotlib.pyplot as plt
 import time
-import statistics
 from datetime import datetime
 from pyvis.network import Network
 import os
@@ -16,9 +15,9 @@ types_global = ['/**/*.pdf', '/**/*.doc', '/**/*.docx', '/**/*.txt']
 debug_on_global = False
 
 # Search n_optimal
-best_len_str_search_d_chars_global = 5
-best_len_str_search_min_range_global = 3
-best_len_str_search_max_range_global = 21
+best_len_str_search_d_chars_global = 2
+best_len_str_search_min_range_global = 10
+best_len_str_search_max_range_global = 60
 
 test_ON = False
 
@@ -26,6 +25,10 @@ string_to_export_global = ''
 
 in_path_global = ''
 out_path_global = ''
+
+default_best_str_global = 40
+
+default_cutoff_global = 0.9
 
 
 def get_file_paths(root_dir):
@@ -94,7 +97,7 @@ def my_print(str_to_print, show_output=False):
     global string_to_export_global
     if debug_on_global or show_output:
         print(str_to_print)
-        string_to_export_global = string_to_export_global + '\n' + str_to_print
+        string_to_export_global = string_to_export_global + '\n' + str(str_to_print)
 
 
 def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
@@ -102,12 +105,12 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
     files_ut_paths_clean = files_ut_paths
     text_strings_l2 = text_strings_full
     n_subs = 0
-    if not is_testrun:
-        edges = []
     # https://towardsdatascience.com/pyvis-visualize-interactive-network-graphs-in-python-77e059791f01
     # https://pyvis.readthedocs.io/en/latest/documentation.html
-    net = Network(height='100%', width='70%')
-    net.barnes_hut()
+    if not is_testrun:
+        edges = []
+        net = Network(height='100%', width='70%')
+        net.barnes_hut()
     for i_file, text_string_full_ut in enumerate(text_strings_full):
         my_print('\n' + str(files_ut_paths[i_file]), show_output)
         substrings = []
@@ -134,25 +137,36 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
     return n_subs
 
 
-def save_figure(x, y):
+def save_figure(x, y, x_base, y_diff):
     global out_path_global
-    fig1, ax1 = plt.subplots()
-    ax1.plot(x, y, '*')
-    ax1.set_title("x, norm(y), " + in_path_global)
-    plt.savefig(out_path_global + '/plagiarism_analysis')
+    global default_cutoff_global
+    plt.subplots()
+    plt.plot(x, y, '*')
+    plt.savefig(out_path_global + '/plagiarism_analysis_x_y')
+    plt.subplots()
+    plt.plot(x_base, y_diff, x_base, [default_cutoff_global] * len(y_diff))
+    plt.savefig(out_path_global + '/plagiarism_analysis_x_ydiff')
 
 
 def find_best_str_len(text_strings_full, files_ut_paths):
+    global default_best_str_global
+    global default_cutoff_global
     substring_lengths = {}
-    for _, i_len in enumerate(range(best_len_str_search_min_range_global, best_len_str_search_max_range_global)):
-        substring_len = i_len * best_len_str_search_d_chars_global
-        my_print('substring len: ' + str(substring_len))
-        substring_lengths[substring_len] = find_i_subs(text_strings_full, files_ut_paths, True, substring_len)
+    for _, i_len in enumerate(range(best_len_str_search_min_range_global, best_len_str_search_max_range_global, best_len_str_search_d_chars_global)):
+        my_print('substring len: ' + str(i_len))
+        substring_lengths[i_len] = find_i_subs(text_strings_full, files_ut_paths, True, i_len)
     lists = sorted(substring_lengths.items())
     x, y = zip(*lists)
-    scaling_factor = statistics.mean([len(text_strings_full_) for text_strings_full_ in text_strings_full])
-    y = [y_/scaling_factor for y_ in y]
-    save_figure(x, y)
+    y_diff = [i / j if j > 0 else 1 for i, j in zip(y[1:], y[:-1])]
+    x_base = x[1:]
+    try:
+        best_str_len = min([x_ for x_, y_ in zip(x_base, y_diff) if y_ > default_cutoff_global])
+        my_print('Best string length found: ' + str(best_str_len), show_output=True)
+    except Exception as e:
+        best_str_len = default_best_str_global
+        my_print('Error finding best string. Outputting default.', show_output=True)
+    save_figure(x, y, x_base, y_diff)
+    return best_str_len
 
 
 def set_and_make_out_dir(in_path):
@@ -167,11 +181,15 @@ def set_and_make_out_dir(in_path):
 
 
 def main(argv):
-    global out_path_global
-
-    check_or_analyze = argv[1]
-
     start_time = round(time.perf_counter(), 2)
+
+    global out_path_global
+    global default_best_str_global
+    global string_to_export_global
+
+    string_to_export_global = ''
+
+    find_best_str_len_ = argv[1]
 
     set_and_make_out_dir(argv[0])
 
@@ -181,12 +199,20 @@ def main(argv):
 
     text_strings_full, files_ut_paths = read_text_strings(files_ut_paths_unfiltered)
 
-    if check_or_analyze == 'pre_check':
-        find_best_str_len(text_strings_full, files_ut_paths)
+    if find_best_str_len_ == 'find':
+        best_str_len = find_best_str_len(text_strings_full, files_ut_paths)
+    elif find_best_str_len_ == 'use-explicit':
+        try:
+            best_str_len = int(argv[2])
+        except Exception:
+            my_print('No best string length provided. Using default string length.', show_output=True)
+            best_str_len = default_best_str_global
     else:
-        best_str_len = int(argv[2])
-        my_print('Using ' + str(best_str_len) + ' as best string length estimator', show_output=True)
-        find_i_subs(text_strings_full, files_ut_paths, False, best_str_len)
+        best_str_len = default_best_str_global
+        my_print('False or no argument. Using default string length.', show_output=True)
+
+    my_print('Using ' + str(best_str_len) + ' as best string length estimator', show_output=True)
+    find_i_subs(text_strings_full, files_ut_paths, False, best_str_len)
 
     time_elapsed_s = time.perf_counter() - start_time
     time_elapsed_m = time_elapsed_s / 60
@@ -202,9 +228,14 @@ def main(argv):
 
 if __name__ == "__main__":
     if test_ON:
-        #main([r'D:\anderes\Textdokumente\Schulreferate', 'check', '15'])
-        #main([r'D:\anderes\Textdokumente\Geschreibsel', 'check', '20'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'check', '60'])
-        main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'check', '50'])
+        #main([r'D:\anderes\Textdokumente\Schulreferate', 'find'])
+        #main([r'D:\anderes\Textdokumente\Geschreibsel', 'find'])
+        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'find'])
+        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'find'])
+        #main([r'D:\anderes\Textdokumente\Schulreferate', 'use-explicit'])
+        #main([r'D:\anderes\Textdokumente\Geschreibsel', 'use-explicit', '20'])
+        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'use-explicit', '50'])
+        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'use-explicit', '60'])
+        pass
     else:
         main(sys.argv[1:])
