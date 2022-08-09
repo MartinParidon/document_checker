@@ -3,3 +3,4 @@
 /.idea
 *.html
 /scripts/__pycache__
+*.pyc
