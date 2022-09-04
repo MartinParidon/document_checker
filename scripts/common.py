@@ -5,12 +5,15 @@ import textract
 supported_extensions_global = ['pdf', 'doc', 'docx', 'txt']
 
 
+# Test consolidation of sub functions:
+# https://textract.readthedocs.io/en/stable/python_package.html
+# text = textract.process('path/to/file.extension')
 def get_string_from_path(text_path):
     txt_file_ext = text_path.split('.')[-1]
     if txt_file_ext in supported_extensions_global:
         if (txt_file_ext == 'doc') or (txt_file_ext == 'docx'):
             try:
-                full_text_ut = textract.process(text_path)
+                full_text_ut = textract.process(text_path).decode("utf8")
                 if full_text_ut:
                     return full_text_ut
                 else:

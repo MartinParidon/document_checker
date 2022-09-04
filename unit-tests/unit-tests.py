@@ -1,7 +1,12 @@
 import unittest
-from scripts import phrase_checker
-from scripts import common
-from scripts import plagiarism_checker
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "../scripts")
+
+import scripts.common as common
+import scripts.phrase_checker as phrase_checker
+import scripts.plagiarism_checker as plagiarism_checker
 
 
 class TestPhraseChecker(unittest.TestCase):
