@@ -6,6 +6,7 @@ from pyvis.network import Network
 import os
 import sys
 from scripts import common
+import re
 
 
 debug_on_global = False
@@ -143,6 +144,19 @@ def set_and_make_out_dir(in_path):
         quit()
 
 
+def delete_citations_in_texts(text_strings_full):
+    text_strings_filtered = []
+    for text_str in text_strings_full:
+        # Verified with https://regex101.com/r/hsASKA/1
+        # Hard coded for now: "(SURNAME, YYYY, Page)"
+        citation_regex = re.compile(r"(\(.*,\s(\d|[1-9]\d|[1-9]\d\d|[1-2]\d\d\d),\sS\.\s(\d|[1-9]\d|[1-9]\d\d|[1-9]\d\d\d|[1-9]\d\d\d\d)\))")
+        citation_occurrences = re.findall(citation_regex, text_str)
+        for cit_occ in citation_occurrences:
+            text_str = text_str.replace(cit_occ[0], '')
+        text_strings_filtered.append(text_str)
+    return text_strings_filtered
+
+
 def main(argv):
     # Start timer
     start_time = round(time.perf_counter(), 2)
@@ -169,6 +183,9 @@ def main(argv):
 
     # Switch between 'find' best string length and 'use-explicit' string length. No other string allowed
     find_best_str_len_ = argv[1]
+
+    # Delete citations so they won't pop up in the list of plagiarisms
+    text_strings_full = delete_citations_in_texts(text_strings_full)
 
     # Based on that switch, either find best string length, use given string length or use default string length
     if find_best_str_len_ == 'find':
