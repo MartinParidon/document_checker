@@ -38,7 +38,7 @@ jobs:
         include:
           - os: windows-latest
             TARGET: windows
-            CMD_BUILD: pyinstaller --onefile scripts/phrase_checker.py
+            CMD_BUILD: python -m PyInstaller --onefile scripts/phrase_checker.py
             OUT_FILE_NAME: clipster.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
     steps:
