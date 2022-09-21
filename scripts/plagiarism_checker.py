@@ -5,7 +5,7 @@ from datetime import datetime
 from pyvis.network import Network
 import os
 import sys
-from scripts import common
+import common
 import re
 
 

@@ -2,7 +2,7 @@ import sys
 import csv
 import os
 import re
-from scripts import common
+import common
 
 
 def get_count_in_list(elements_ut, list_ut):
@@ -45,25 +45,25 @@ def input_handling(argv):
         words_path = argv[2].replace('\\', '/')
     except Exception as e:
         print('You didn\'t provide all necessary input params.\n' + str(e))
-        quit()
+        sys.exit()
     if os.path.exists(text_ut_path) and os.path.exists(phrases_path) and os.path.exists(words_path):
         text_ut_ext = os.path.splitext(text_ut_path)[1]
         phrases_path_ext = os.path.splitext(phrases_path)[1]
         words_path_ext = os.path.splitext(words_path)[1]
         if text_ut_ext.replace('.', '') not in common.supported_extensions_global:
             print('Check your doc input path extensions.\nText under test must be pdf, dox or doc (very old doc files might not work).')
-            quit()
+            sys.exit()
         elif not (phrases_path_ext == '.csv'):
             print('Phrase list not csv format.')
-            quit()
+            sys.exit()
         elif not (words_path_ext == '.csv'):
             print('Word list not csv format.')
-            quit()
+            sys.exit()
         else:
             return text_ut_path, phrases_path, words_path
     else:
         print('Check if all your input paths are valid.')
-        quit()
+        sys.exit()
 
 
 def extract_words_only_from_string(full_text_ut):
@@ -120,7 +120,7 @@ def main(argv):
     # Early out if doc empty
     if not full_text_ut:
         print('Document under test is empty. Provide link to a document that is not empty.')
-        quit()
+        sys.exit()
 
     # TODO: Check if no 'space' within any entry of list
     # Fetch list of bad phrases from provided csv file
