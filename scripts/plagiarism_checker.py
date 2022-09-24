@@ -157,6 +157,18 @@ def delete_citations_in_texts(text_strings_full):
     return text_strings_filtered
 
 
+def delete_bibliography(text_strings_full):
+    text_strings_filtered = []
+    num_correct_citations = []
+    for text_str in text_strings_full:
+        # https://regex101.com/r/ylDKB4/1
+        # https://www.beltz.de/fileadmin/beltz/downloads/Manuskripthinweise.pdf
+        citation_regex = re.compile(r".*,.*?\((\d|[1-9]\d|[1-9]\d\d|[1-9]\d\d\d)\)\.\s.*?\..*\.")
+        text_strings_filtered.append(re.sub(citation_regex, '', text_str))
+        num_correct_citations.append(len(re.findall(citation_regex, text_str)))
+    return text_strings_filtered, num_correct_citations
+
+
 def main(argv):
     # Start timer
     start_time = round(time.perf_counter(), 2)
@@ -169,7 +181,8 @@ def main(argv):
     # Flush output string
     string_to_export_global = ''
 
-    # TODO Implement...     # Implement...  https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
+    # TODO Implement...
+    # https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
     # Set output path according to given input path name. Then print
     in_path = argv[0]
     set_and_make_out_dir(in_path)
@@ -186,6 +199,13 @@ def main(argv):
 
     # Delete citations so they won't pop up in the list of plagiarisms
     text_strings_full = delete_citations_in_texts(text_strings_full)
+
+    # Delete and count each valid bibliography entry
+    text_strings_full, num_correct_citations = delete_bibliography(text_strings_full)
+
+    # And output this...
+    for files_ut_path, num_correct_citation in zip(files_ut_paths, num_correct_citations):
+        my_print(files_ut_path + ' used >>' + str(num_correct_citation) + '<< correct citations. These are excluded from the analysis.', show_output=True)
 
     # Based on that switch, either find best string length, use given string length or use default string length
     if find_best_str_len_ == 'find':
