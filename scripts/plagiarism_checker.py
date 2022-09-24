@@ -16,8 +16,6 @@ best_len_str_search_d_chars_global = 2
 best_len_str_search_min_range_global = 10
 best_len_str_search_max_range_global = 60
 
-test_ON = False
-
 string_to_export_global = ''
 
 in_path_global = ''
@@ -133,17 +131,6 @@ def find_best_str_len(text_strings_full, files_ut_paths):
     return best_str_len
 
 
-def set_and_make_out_dir(in_path):
-    global out_path_global
-    global in_path_global
-    if not len(os.listdir(in_path)) == 0:
-        in_path_global = in_path
-        out_path_global = os.path.split(os.path.realpath(__file__))[0] + '/../out/' + in_path_global.replace('\\', '_').replace(':', '_')
-        os.makedirs(out_path_global, exist_ok=True)
-    else:
-        quit()
-
-
 def delete_citations_in_texts(text_strings_full):
     text_strings_filtered = []
     for text_str in text_strings_full:
@@ -169,7 +156,7 @@ def delete_bibliography(text_strings_full):
     return text_strings_filtered, num_correct_citations
 
 
-def main(argv):
+def main(input_args):
     # Start timer
     start_time = round(time.perf_counter(), 2)
 
@@ -184,18 +171,28 @@ def main(argv):
     # TODO Implement...
     # https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
     # Set output path according to given input path name. Then print
-    in_path = argv[0]
-    set_and_make_out_dir(in_path)
+    in_path = input_args[0]
+
+    # Make out path
+    out_path_global = input_args[1]
+    try:
+        os.makedirs(out_path_global, exist_ok=True)
+    except Exception as e:
+        my_print('Error making output path.', show_output=True)
+        sys.exit()
+
+    # Infos
     my_print('\nTesting: ' + in_path, show_output=True)
+    my_print('\nWriting to: ' + out_path_global, show_output=True)
 
     # Get all file paths that fit 1. given input path, 2. globally defined extensions
-    files_ut_paths_unfiltered = get_file_paths(argv[0])
+    files_ut_paths_unfiltered = get_file_paths(in_path)
 
     # Get full strings of valid files and their respective paths
     text_strings_full, files_ut_paths = read_text_strings(files_ut_paths_unfiltered)
 
     # Switch between 'find' best string length and 'use-explicit' string length. No other string allowed
-    find_best_str_len_ = argv[1]
+    find_best_str_len_ = input_args[2]
 
     # Delete citations so they won't pop up in the list of plagiarisms
     text_strings_full = delete_citations_in_texts(text_strings_full)
@@ -212,7 +209,7 @@ def main(argv):
         best_str_len = find_best_str_len(text_strings_full, files_ut_paths)
     elif find_best_str_len_ == 'use-explicit':
         try:
-            best_str_len = int(argv[2])
+            best_str_len = int(input_args[3])
         except Exception:
             my_print('No best string length provided. Using default string length.', show_output=True)
             best_str_len = default_best_str_global
@@ -237,15 +234,7 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    if test_ON:
-        main([r'D:\anderes\Textdokumente\Schulreferate', 'find'])
-        main([r'D:\anderes\Textdokumente\Geschreibsel', 'find'])
-        main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'find'])
-        main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'find'])
-        #main([r'D:\anderes\Textdokumente\Schulreferate', 'use-explicit'])
-        #main([r'D:\anderes\Textdokumente\Geschreibsel', 'use-explicit', '20'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Lebenslauf', 'use-explicit', '50'])
-        #main([r'D:\Geschäftlich\Bewerbungsunterlagen\Bewerbungen', 'use-explicit', '60'])
-        pass
+    if len(sys.argv) < 2:
+        my_print('Please provide useful input. Normal mode:\n\nplagiarism_checker path-to-in-folder path-to-out-folder find\n\nOr advanced mode. Make sure to replace <<useful number>> with a useful number:\n\nplagiarism_checker path-to-in-folder path-to-out-folder use-explicit <<useful number>>', show_output=True)
     else:
         main(sys.argv[1:])

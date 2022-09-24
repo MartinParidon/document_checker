@@ -42,8 +42,9 @@ def write_count_dict(cv_in, dict_ut):
 def input_handling(argv):
     try:
         text_ut_path = argv[0].replace('\\', '/')
-        phrases_path = argv[1].replace('\\', '/')
-        words_path = argv[2].replace('\\', '/')
+        out_dir = argv[1].replace('\\', '/')
+        phrases_path = argv[2].replace('\\', '/')
+        words_path = argv[3].replace('\\', '/')
     except Exception as e:
         print('You didn\'t provide all necessary input params.\n' + str(e))
         sys.exit()
@@ -61,7 +62,7 @@ def input_handling(argv):
             print('Word list not csv format.')
             sys.exit()
         else:
-            return text_ut_path, phrases_path, words_path
+            return text_ut_path, out_dir, phrases_path, words_path
     else:
         print('Check if all your input paths are valid.')
         sys.exit()
@@ -72,7 +73,7 @@ def extract_words_only_from_string(full_text_ut):
     signs_to_delete = [',', '.', '-', '_', '–', ':', '(', ')', '[', ']']
     words_filtered = []
     for sign in signs_to_delete:
-        words_list = list(filter((sign).__ne__, words_list))
+        words_list = list(filter(sign.__ne__, words_list))
     for word in words_list:
         if any(sign in word for sign in signs_to_delete):
             signs_found = [sign for sign in signs_to_delete if sign in word]
@@ -110,10 +111,15 @@ def console_out(phrases_dict, words_dict, word_count):
 
 def main(argv):
     # If valid, fetch path to text and input list
-    text_path, phrases_path, words_path = input_handling(argv)
+    text_path, out_dir, phrases_path, words_path = input_handling(argv)
 
     # Make output directory
-    out_dir = make_dir_with_id(text_path)
+    # TODO consolidate with plag checker
+    try:
+        os.makedirs(out_dir, exist_ok=True)
+    except Exception as e:
+        print('Error making output path.')
+        sys.exit()
 
     # Fetch full text of file in local string
     full_text_ut = common.get_string_from_path(text_path)
