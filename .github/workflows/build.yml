@@ -58,7 +58,7 @@ jobs:
         pip install -r requirements.txt
     - name: Run Unit Test
       working-directory: ./unit-tests
-      run: python -m pytest
+      run: pytest unit-tests.py
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
     - name: Load Release URL File from release job
