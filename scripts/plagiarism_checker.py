@@ -9,15 +9,6 @@ import common
 import re
 import argparse
 
-parser = argparse.ArgumentParser(description='Test if any number of documents within the input folder share similar passages of texts')
-
-parser.add_argument('in', help='Input folder. Each docx, txt, doc and pdf below this directory will be included')
-parser.add_argument('out', help='Path to output folder')
-parser.add_argument('-f', '--find', action='store_true', help='Let the algorithm find the optimal string cutoff length. Might not work perfectly')
-parser.add_argument('-e', '--use_explicit', help='Use a custom string cutoff length. Write 40 if you have absolutely no idea')
-args = parser.parse_args()
-
-
 debug_on_global = False
 
 # Search n_optimal
@@ -243,6 +234,12 @@ def main(input_args):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Test if any number of documents within the input folder share similar passages of texts')
+    parser.add_argument('in', help='Input folder. Each docx, txt, doc and pdf below this directory will be included')
+    parser.add_argument('out', help='Path to output folder')
+    parser.add_argument('-f', '--find', action='store_true', help='Let the algorithm find the optimal string cutoff length. Might not work perfectly')
+    parser.add_argument('-e', '--use_explicit', help='Use a custom string cutoff length. Write 40 if you have absolutely no idea')
+    args = parser.parse_args()
     if len(sys.argv) < 2:
         my_print('Please provide useful input. Type \'plariarism_checker -h\' to get help.', show_output=True)
     else:

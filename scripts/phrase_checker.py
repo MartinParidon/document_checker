@@ -5,13 +5,6 @@ import re
 import common
 import argparse
 
-parser = argparse.ArgumentParser(description='Test a text document for excessive use of words or phrases that should be avoided')
-parser.add_argument('doc', help='Path to document under test')
-parser.add_argument('out', help='Path to output folder')
-parser.add_argument('phrases', help='Link to phrases csv file that shall be tested')
-parser.add_argument('words', help='Link to words csv file that shall be tested')
-args = parser.parse_args()
-
 
 def get_count_in_list(elements_ut, list_ut):
     elements_ut_lower = [e.lower() for e in elements_ut]
@@ -154,4 +147,11 @@ def main(argv):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description='Test a text document for excessive use of words or phrases that should be avoided')
+    parser.add_argument('doc', help='Path to document under test')
+    parser.add_argument('out', help='Path to output folder')
+    parser.add_argument('phrases', help='Link to phrases csv file that shall be tested')
+    parser.add_argument('words', help='Link to words csv file that shall be tested')
+    args = parser.parse_args()
     main(sys.argv[1:])
