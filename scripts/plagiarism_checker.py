@@ -95,7 +95,6 @@ def find_i_subs(text_strings_full, files_ut_paths, is_testrun, substring_len):
     if not is_testrun:
         net.add_edges(edges)
         net.show_buttons(filter_=['physics'])
-        net.show(out_path_global + '/graph.html')
     return n_subs
 
 
