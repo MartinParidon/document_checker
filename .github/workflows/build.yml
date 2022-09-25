@@ -38,7 +38,7 @@ jobs:
         include:
           - os: windows-latest
             TARGET: windows
-            CMD_BUILD: python -m PyInstaller --onefile scripts/phrase_checker.py
+            CMD_BUILD: python -m PyInstaller scripts/phrase_checker.py --onefile --collect-all pyvis
             OUT_FILE_NAME: phrase_checker.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
           - os: windows-latest

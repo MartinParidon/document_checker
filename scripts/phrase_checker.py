@@ -5,6 +5,13 @@ import re
 import common
 import argparse
 
+parser = argparse.ArgumentParser(description='Test a text document for excessive use of words or phrases that should be avoided')
+parser.add_argument('doc', help='Path to document under test')
+parser.add_argument('out', help='Path to output folder')
+parser.add_argument('phrases', help='Link to phrases csv file that shall be tested')
+parser.add_argument('words', help='Link to words csv file that shall be tested')
+args = parser.parse_args()
+
 
 def get_count_in_list(elements_ut, list_ut):
     elements_ut_lower = [e.lower() for e in elements_ut]
@@ -85,13 +92,6 @@ def extract_words_only_from_string(full_text_ut):
             words_filtered.append(word)
     words_filtered = [x for x in words_filtered if not (x.isdigit())]
     return words_filtered
-
-
-def make_dir_with_id(text_path):
-    ID = text_path.split('/')[-1].split('.')[0]
-    out_dir = os.getcwd() + '/out/' + ID
-    os.makedirs(out_dir, exist_ok=True)
-    return out_dir
 
 
 def console_out(phrases_dict, words_dict, word_count):

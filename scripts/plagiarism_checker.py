@@ -7,6 +7,15 @@ import os
 import sys
 import common
 import re
+import argparse
+
+parser = argparse.ArgumentParser(description='Test if any number of documents within the input folder share similar passages of texts')
+
+parser.add_argument('in', help='Input folder. Each docx, txt, doc and pdf below this directory will be included')
+parser.add_argument('out', help='Path to output folder')
+parser.add_argument('-f', '--find', action='store_true', help='Let the algorithm find the optimal string cutoff length. Might not work perfectly')
+parser.add_argument('-e', '--use_explicit', help='Use a custom string cutoff length. Write 40 if you have absolutely no idea')
+args = parser.parse_args()
 
 
 debug_on_global = False
@@ -205,9 +214,9 @@ def main(input_args):
         my_print(files_ut_path + ' used >>' + str(num_correct_citation) + '<< correct citations. These are excluded from the analysis.', show_output=True)
 
     # Based on that switch, either find best string length, use given string length or use default string length
-    if find_best_str_len_ == 'find':
+    if find_best_str_len_ == '-f' or find_best_str_len_ == '--find':
         best_str_len = find_best_str_len(text_strings_full, files_ut_paths)
-    elif find_best_str_len_ == 'use-explicit':
+    elif find_best_str_len_ == '-e' or find_best_str_len_ == '--use_explicit':
         try:
             best_str_len = int(input_args[3])
         except Exception:
@@ -218,7 +227,7 @@ def main(input_args):
         my_print('False or no argument. Using default string length.', show_output=True)
 
     # Print used string length and run test
-    my_print('Using ' + str(best_str_len) + ' as best string length estimator', show_output=True)
+    my_print('\nUsing ' + str(best_str_len) + ' as best string length estimator', show_output=True)
     find_i_subs(text_strings_full, files_ut_paths, False, best_str_len)
 
     # Write total elapsed time
@@ -235,6 +244,6 @@ def main(input_args):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        my_print('Please provide useful input. Normal mode:\n\nplagiarism_checker path-to-in-folder path-to-out-folder find\n\nOr advanced mode. Make sure to replace <<useful number>> with a useful number:\n\nplagiarism_checker path-to-in-folder path-to-out-folder use-explicit <<useful number>>', show_output=True)
+        my_print('Please provide useful input. Type \'plariarism_checker -h\' to get help.', show_output=True)
     else:
         main(sys.argv[1:])
