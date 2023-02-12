@@ -38,12 +38,12 @@ jobs:
         include:
           - os: windows-latest
             TARGET: windows
-            CMD_BUILD: python -m PyInstaller scripts/phrase_checker.py --onefile
+            CMD_BUILD: python -m PyInstaller src/phrase_checker.py --onefile
             OUT_FILE_NAME: phrase_checker.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
           - os: windows-latest
             TARGET: windows
-            CMD_BUILD: python -m PyInstaller scripts/plagiarism_checker.py --onefile --collect-all pyvis
+            CMD_BUILD: python -m PyInstaller src/plagiarism_checker.py --onefile --collect-all pyvis
             OUT_FILE_NAME: plagiarism_checker.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
     steps:

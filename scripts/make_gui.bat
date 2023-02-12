@@ -1,0 +1,1 @@
+"..\venv\Scripts\pyside6-uic" "..\gui-design\phrase_checker.ui" > "..\src\phrase_checker_gui.py"
