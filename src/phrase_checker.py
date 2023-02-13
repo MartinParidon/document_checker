@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import sys
 import csv
 import os
@@ -5,6 +7,7 @@ import re
 import common
 import phrase_checker_gui
 from PySide6 import QtWidgets
+import yaml
 
 
 class MainWindow(QtWidgets.QMainWindow, phrase_checker_gui.Ui_MainWindow):
@@ -15,11 +18,29 @@ class MainWindow(QtWidgets.QMainWindow, phrase_checker_gui.Ui_MainWindow):
         self.output_folder_path = ''
         self.phrases_file_path = ''
         self.words_file_path = ''
+        self.config_file_path = ''
         self.pushButton_input_folder_path.clicked.connect(self.on_pushButton_input_folder_path_clicked)
         self.pushButton_output_folder_path.clicked.connect(self.on_pushButton_output_folder_path_clicked)
         self.pushButton_phrases_file_path.clicked.connect(self.on_pushButton_phrases_file_path_clicked)
         self.pushButton_words_file_path.clicked.connect(self.on_pushButton_words_file_path_clicked)
         self.pushButton_run.clicked.connect(self.on_pushButton_run_clicked)
+        if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]) and sys.argv[1].split('.')[-1] == 'yaml':
+            self.load_config(sys.argv[1])
+
+    def load_config(self, config_file_path):
+        with open(config_file_path, 'r') as stream:
+            try:
+                config = yaml.safe_load(stream)
+                self.input_folder_path = config['input_folder_path']
+                self.lineEdit_input_folder_path.setText(self.input_folder_path)
+                self.output_folder_path = config['output_folder_path']
+                self.lineEdit_output_folder_path.setText(self.output_folder_path)
+                self.phrases_file_path = config['phrases_file_path']
+                self.lineEdit_phrases_file_path.setText(self.phrases_file_path)
+                self.words_file_path = config['words_file_path']
+                self.lineEdit_words_file_path.setText(self.words_file_path)
+            except yaml.YAMLError as exc:
+                print(exc)
 
     def on_pushButton_input_folder_path_clicked(self):
         self.input_folder_path = QtWidgets.QFileDialog.getExistingDirectory(self,
@@ -48,6 +69,10 @@ class MainWindow(QtWidgets.QMainWindow, phrase_checker_gui.Ui_MainWindow):
         self.lineEdit_words_file_path.setText(self.words_file_path)
 
     def on_pushButton_run_clicked(self):
+        with open(self.output_folder_path + '/config.yaml', 'w') as yaml_file:
+            yaml.dump({'input_folder_path': self.input_folder_path, 'output_folder_path': self.output_folder_path,
+                       'phrases_file_path': self.phrases_file_path, 'words_file_path': self.words_file_path}, yaml_file,
+                      default_flow_style=False, allow_unicode=True)
         main([self.input_folder_path, self.output_folder_path, self.phrases_file_path, self.words_file_path])
 
 
@@ -57,7 +82,7 @@ def get_count_in_list(elements_ut, list_ut):
     out_dict = dict.fromkeys(elements_ut_lower)
     for elem_ut in elements_ut_lower:
         out_dict[elem_ut] = list_ut_lower.count(elem_ut)
-    return dict(sorted(out_dict.items(), key=lambda kv: kv[1], reverse=True))
+    return out_dict
 
 
 # TODO Make sure substring isn't enclosed by chars
@@ -67,31 +92,40 @@ def get_count_in_string(elements_ut, string_ut):
     out_dict = dict.fromkeys(elements_ut_lower)
     for elem_ut in elements_ut_lower:
         out_dict[elem_ut] = string_ut_lower.count(elem_ut)
-    return dict(sorted(out_dict.items(), key=lambda kv: kv[1], reverse=True))
+    return out_dict
 
 
 def get_list_from_csv_first_row(csv_file):
     with open(csv_file, newline='') as csvfile:
         csvreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         row_1 = next(csvreader)
-    return row_1
+        row_1_lower = [e.lower() for e in row_1]
+    return row_1_lower
 
 
-def write_count_dict(cv_in, dict_ut):
-    with open(cv_in, 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=dict_ut.keys())
+def write_count_dict(csv_path, list_of_dicts, text_paths):
+    with open(csv_path, 'w', newline='') as csvfile:
+        header = list(list_of_dicts[0].keys())
+        header.append('text_path')
+        writer = csv.DictWriter(csvfile, fieldnames=header)
         writer.writeheader()
-        writer.writerows([dict_ut])
+        for idx, specific_dict in enumerate(list_of_dicts):
+            specific_dict['text_path'] = text_paths[idx]
+            writer.writerow(specific_dict)
 
 
 def input_handling(argv):
+    # argv = [self.input_folder_path, self.output_folder_path, self.phrases_file_path, self.words_file_path]
     files_to_check = []
-    # TODO is this recursive?
-    for file in os.listdir(argv[0]):
-        if not (file.endswith(".doc") or file.endswith(".docx") or file.endswith("pdf") or file.endswith(".txt")): # ANY (?!)
-            continue
-        else:
-            files_to_check.append(os.path.join(argv[0], file))
+    for folder, subs, filenames in os.walk(argv[0]):
+        for filename in filenames:
+            if not (filename.endswith(".doc") or filename.endswith(".docx") or filename.endswith("pdf") or filename.endswith(".txt")): # ANY (?!)
+                continue
+            else:
+                files_to_check.append(os.path.join(argv[0], os.path.join(folder, filename)))
+    if len(files_to_check) == 0:
+        print("No files to check")
+        sys.exit()
     return files_to_check, argv[1], argv[2], argv[3]
 
 
@@ -130,66 +164,51 @@ def console_out(phrases_dict, words_dict, word_count):
 
 
 def main(argv):
+    # argv = [self.input_folder_path, self.output_folder_path, self.phrases_file_path, self.words_file_path]
     # If valid, fetch path to text and input list
     text_paths, out_dir, phrases_path, words_path = input_handling(argv)
 
+    # Fetch list of bad phrases from provided csv file
+    phrases_list = sorted(get_list_from_csv_first_row(phrases_path))
+
+    # Fetch list of bad words from provided csv file
+    words_list = sorted(get_list_from_csv_first_row(words_path))
+
+    # Aggregate bad phrases and words in one dict
+    phrases_dicts_list = []
+    words_dicts_list = []
+
     # Fetch full text of file in local string
     for text_path in text_paths:
-
-        # Make output directory
-        # TODO consolidate with plag checker
-        out_dir_file = os.path.join(out_dir, os.path.basename(text_path))
-        try:
-            os.makedirs(out_dir_file, exist_ok=True)
-        except Exception as e:
-            print('Error making output path.')
-            sys.exit()
 
         full_text_ut = common.get_string_from_path(text_path)
 
         # Early out if doc empty
         if not full_text_ut:
-            print('Document under test is empty. Provide link to a document that is not empty.')
-            sys.exit()
+            print('Error reading file: {}'.format(text_path))
+            continue
 
         # TODO: Check if no 'space' within any entry of list
-        # Fetch list of bad phrases from provided csv file
-        phrases_list = get_list_from_csv_first_row(phrases_path)
+        # ??
 
         # Get count of bad phrases as absolute counts within full text
-        phrases_dict = get_count_in_string(phrases_list, full_text_ut)
-
-        # Fetch list of bad words from provided csv file
-        words_list = get_list_from_csv_first_row(words_path)
+        phrases_counts = get_count_in_string(phrases_list, full_text_ut)
+        phrases_dicts_list.append(phrases_counts)
 
         # Fetch list of individual words within doc ut
         single_words_within_txt_ut = extract_words_only_from_string(full_text_ut)
 
         # Get count of bad words as absolute counts within list of words
-        words_dict = get_count_in_list(words_list, single_words_within_txt_ut)
+        words_counts = get_count_in_list(words_list, single_words_within_txt_ut)
+        words_dicts_list.append(words_counts)
 
-        # Write output dicts to csv
-        write_count_dict(out_dir_file + '/phrases.csv', phrases_dict)
-        write_count_dict(out_dir_file + '/words.csv', words_dict)
-
-        # Write console output
-        console_out(phrases_dict, words_dict, len(single_words_within_txt_ut))
+    # Write output dicts to csv
+    write_count_dict(out_dir + '/phrases.csv', phrases_dicts_list, text_paths)
+    write_count_dict(out_dir + '/words.csv', words_dicts_list, text_paths)
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    #parser = argparse.ArgumentParser(
-    #    description='Test a text document for excessive use of words or phrases that should be avoided')
-    #parser.add_argument('doc', help='Path to document under test')
-    #parser.add_argument('out', help='Path to output folder')
-    #parser.add_argument('phrases', help='Link to phrases csv file that shall be tested')
-    #parser.add_argument('words', help='Link to words csv file that shall be tested')
-    #args = parser.parse_args()
-    #main(sys.argv[1:])
-
     mainwindow = MainWindow()
     mainwindow.show()
     sys.exit(app.exec())
-    #mainwindow.show()
-    #cfg_file_ext = os.path.splitext(app.lineEdit_input_folder)[1]
-    #main(sys.argv[1:])

@@ -27,7 +27,7 @@
      <string>Run</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -41,6 +41,9 @@
       <widget class="QLineEdit" name="lineEdit_input_folder_path">
        <property name="enabled">
         <bool>true</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
        <property name="readOnly">
         <bool>true</bool>
@@ -56,6 +59,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QLineEdit" name="lineEdit_output_folder_path">
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -70,6 +76,9 @@
      </item>
      <item row="2" column="0">
       <widget class="QLineEdit" name="lineEdit_phrases_file_path">
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
@@ -84,6 +93,9 @@
      </item>
      <item row="3" column="0">
       <widget class="QLineEdit" name="lineEdit_words_file_path">
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>
