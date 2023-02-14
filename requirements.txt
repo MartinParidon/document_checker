@@ -66,5 +66,5 @@ zipp
 textract
 pyvis
 PyYAML
-PySide6
+PySide6==6.4.2
 shiboken6
