@@ -64,4 +64,7 @@ ebcdic
 pyinstaller
 zipp
 textract
-pyvis==0.2.1
+pyvis
+PyYAML
+PySide6
+shiboken6
