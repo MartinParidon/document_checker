@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append(os.path.dirname(sys.path[0]) + '/scripts')
+sys.path.append(os.path.dirname(sys.path[0]) + '/src')
 
 import common
 import phrase_checker
