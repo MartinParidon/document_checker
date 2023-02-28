@@ -122,7 +122,7 @@ def input_handling(argv):
             if not (filename.endswith(".doc") or filename.endswith(".docx") or filename.endswith("pdf") or filename.endswith(".txt")): # ANY (?!)
                 continue
             else:
-                files_to_check.append(os.path.join(argv[0], os.path.join(folder, filename)))
+                files_to_check.append(os.path.join(argv[0], os.path.join(folder, filename)).replace('\\', '/'))
     if len(files_to_check) == 0:
         print("No files to check")
         sys.exit()
@@ -178,6 +178,9 @@ def main(argv):
     phrases_dicts_list = []
     words_dicts_list = []
 
+    # Failed files
+    failed_files = []
+
     # Fetch full text of file in local string
     for text_path in text_paths:
 
@@ -185,11 +188,13 @@ def main(argv):
 
         # Early out if doc empty
         if not full_text_ut:
-            print('Error reading file: {}'.format(text_path))
+            print('Error reading file: {}. Removing it from the list.'.format(text_path))
+            failed_files.append(text_path)
             continue
+        else:
+            print('Processing file: {}'.format(text_path))
 
         # TODO: Check if no 'space' within any entry of list
-        # ??
 
         # Get count of bad phrases as absolute counts within full text
         phrases_counts = get_count_in_string(phrases_list, full_text_ut)
@@ -202,9 +207,16 @@ def main(argv):
         words_counts = get_count_in_list(words_list, single_words_within_txt_ut)
         words_dicts_list.append(words_counts)
 
+    # Remove failed files from text_paths
+    for failed_file in failed_files:
+        text_paths.remove(failed_file)
+
     # Write output dicts to csv
     write_count_dict(out_dir + '/phrases.csv', phrases_dicts_list, text_paths)
     write_count_dict(out_dir + '/words.csv', words_dicts_list, text_paths)
+
+    # Print "Finished" to console
+    print('Finished')
 
 
 if __name__ == "__main__":

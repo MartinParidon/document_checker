@@ -21,24 +21,30 @@ def get_string_from_path(text_path):
             except Exception:
                 return None
         elif txt_file_ext == 'pdf':
-            reader = PdfReader(text_path)
-            full_text_ut = ""
-            for page in reader.pages:
-                try:
-                    full_text_ut += page.extract_text() + " "
-                except Exception:
-                    continue
-            if full_text_ut:
-                return full_text_ut
-            else:
-                return None
-        elif txt_file_ext == 'txt':
-            with open(text_path, "r") as text_file:
-                full_text_ut = text_file.read()
+            try:
+                reader = PdfReader(text_path)
+                full_text_ut = ""
+                for page in reader.pages:
+                    try:
+                        full_text_ut += page.extract_text() + " "
+                    except Exception:
+                        continue
                 if full_text_ut:
                     return full_text_ut
                 else:
                     return None
+            except Exception:
+                return None
+        elif txt_file_ext == 'txt':
+            try:
+                with open(text_path, "r") as text_file:
+                    full_text_ut = text_file.read()
+                    if full_text_ut:
+                        return full_text_ut
+                    else:
+                        return None
+            except Exception:
+                return None
         else:
             return None
     else:
